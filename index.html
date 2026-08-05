@@ -1,13 +1,43 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8"/>
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg"/>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" />
     <link rel="stylesheet" type="text/css" href="/src/style.css" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-    <title>web-snake-game</title>
+    <script type="module" src="src/main.ts" defer></script>
+    <title>Snake Game</title>
 </head>
 <body>
-    <script type="module" src="src/main.ts"></script>
+    <header class="app-header">
+        <div class="app-header__intro">
+            <h1 class="title" aria-label="Snake">
+                <span class="title__glyph" aria-hidden="true"></span><span aria-hidden="true">nake</span>
+            </h1>
+            <p class="hint">
+                Use the
+                <kbd class="key">&larr;</kbd><kbd class="key">&uarr;</kbd><kbd class="key">&darr;</kbd><kbd class="key">&rarr;</kbd>
+                arrow keys to start playing
+            </p>
+        </div>
+
+        <div class="score-panel">
+            <div class="score-panel__row">
+                <span class="score-panel__label">Score</span>
+                <span class="score-panel__value" id="score-value">0</span>
+            </div>
+            <div class="score-panel__row score-panel__row--sub">
+                <span class="score-panel__label score-panel__label--sub">Best</span>
+                <span class="score-panel__value score-panel__value--sub" id="high-score-value">0</span>
+            </div>
+        </div>
+    </header>
+
+    <main class="game-area">
+        <canvas id="game-canvas"></canvas>
+    </main>
 </body>
 </html>
