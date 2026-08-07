@@ -1,4 +1,5 @@
 import type { Tile } from '../model/Tile.ts';
+import type { Coordinates } from '../model/Coordinates.ts';
 
 export class CanvasView {
   #gameCanvas: HTMLCanvasElement;
@@ -21,6 +22,14 @@ export class CanvasView {
     this.#gameCanvasContext = context;
   }
 
+  get canvasWidth() {
+    return this.#gameCanvas.width;
+  }
+
+  get canvasHeight() {
+    return this.#gameCanvas.height;
+  }
+
   resizeCanvas() {
     this.#gameCanvas.width = this.#gameCanvasContainer.clientWidth;
     this.#gameCanvas.height = this.#gameCanvasContainer.clientHeight;
@@ -32,11 +41,32 @@ export class CanvasView {
 
   drawRectangle(color: string, tile: Tile) {
     this.#gameCanvasContext.fillStyle = color;
-    this.#gameCanvasContext.fillRect(
-      tile.xPosition,
-      tile.yPosition,
-      tile.width,
-      tile.height,
-    );
+    this.#gameCanvasContext.fillRect(tile.xPosition, tile.yPosition, tile.size, tile.size);
+  }
+
+  drawCircle(color: string, tile: Tile) {
+    this.#gameCanvasContext.fillStyle = color;
+    this.#gameCanvasContext.strokeStyle = color;
+    this.#gameCanvasContext.beginPath();
+    this.#gameCanvasContext.arc(tile.xPosition, tile.yPosition, tile.radius, 0, 2 * Math.PI);
+    this.#gameCanvasContext.fill();
+    this.#gameCanvasContext.stroke();
+    this.#gameCanvasContext.closePath();
+  }
+
+  isInsideCanvas(tile: Tile): boolean {
+    // these two corners are enough to cover all possible ways to exit the canvas
+    const tileCorners: Array<Coordinates> = [tile.topLeftCorner, tile.bottomRightCorner];
+
+    for (const corner of tileCorners) {
+      const isHorizontallyInside = corner.x >= 0 && corner.x <= this.#gameCanvas.width;
+      const isVerticallyInside = corner.y >= 0 && corner.y <= this.#gameCanvas.height;
+
+      if (!isHorizontallyInside || !isVerticallyInside) {
+        return false;
+      }
+    }
+
+    return true;
   }
 }

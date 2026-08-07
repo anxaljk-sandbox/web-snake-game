@@ -1,40 +1,53 @@
+import { TileType } from './TileType.ts';
+import type { Coordinates } from './Coordinates.ts';
+
 export class Tile {
   static readonly #DEFAULT_TILE_SIZE = 70;
 
-  readonly #width: number;
-  readonly #height: number;
+  readonly tileType: TileType;
+  xPosition: number;
+  yPosition: number;
+  readonly size: number;
 
-  #xPosition: number;
-  #yPosition: number;
-
-  constructor(xPosition: number, yPosition: number, width?: number, height?: number) {
-    this.#xPosition = xPosition;
-    this.#yPosition = yPosition;
-    this.#width = width ?? Tile.#DEFAULT_TILE_SIZE;
-    this.#height = height ?? Tile.#DEFAULT_TILE_SIZE;
+  constructor(tileType: TileType, xPosition: number, yPosition: number, size?: number) {
+    this.tileType = tileType;
+    this.xPosition = xPosition;
+    this.yPosition = yPosition;
+    this.size = size ?? Tile.#DEFAULT_TILE_SIZE;
   }
 
-  get xPosition() {
-    return this.#xPosition;
+  get radius() {
+    return this.size / 2;
   }
 
-  set xPosition(value: number) {
-    this.#xPosition = value;
+  get topLeftCorner(): Coordinates {
+    // a circle's xPosition & yPosition store its center, for a square they store the corner
+    const offset = this.tileType === TileType.Circle ? this.radius : 0;
+
+    return {
+      x: this.xPosition - offset,
+      y: this.yPosition - offset,
+    };
   }
 
-  get yPosition() {
-    return this.#yPosition;
+  get topRightCorner(): Coordinates {
+    return {
+      x: this.topLeftCorner.x + this.size,
+      y: this.topLeftCorner.y,
+    };
   }
 
-  set yPosition(value: number) {
-    this.#yPosition = value;
+  get bottomLeftCorner(): Coordinates {
+    return {
+      x: this.topLeftCorner.x,
+      y: this.topLeftCorner.y + this.size,
+    };
   }
 
-  get width() {
-    return this.#width;
-  }
-
-  get height() {
-    return this.#height;
+  get bottomRightCorner(): Coordinates {
+    return {
+      x: this.topLeftCorner.x + this.size,
+      y: this.topLeftCorner.y + this.size,
+    };
   }
 }

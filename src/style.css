@@ -55,8 +55,8 @@ body {
   margin-right: 0.04em;
   vertical-align: -0.0875em;
   background-color: currentColor;
-  -webkit-mask: url("/favicon.svg") no-repeat center / contain;
-  mask: url("/favicon.svg") no-repeat center / contain;
+  -webkit-mask: url("./../public/favicon.svg") no-repeat center / contain;
+  mask: url("./../public/favicon.svg") no-repeat center / contain;
 }
 
 .hint {
