@@ -8,7 +8,7 @@ let snakeGameController: SnakeGameController;
 function main() {
   canvasView.resizeCanvas();
 
-  snakeGameController = new SnakeGameController(canvasView, 50, gameCanvas.height / 2);
+  snakeGameController = new SnakeGameController(canvasView, 200, gameCanvas.height / 2);
   snakeGameController.play();
 }
 
