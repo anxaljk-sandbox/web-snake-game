@@ -1,5 +1,5 @@
 import type { Tile } from '../model/Tile.ts';
-import type { Coordinates } from '../model/Coordinates.ts';
+import type { Bounds } from '../model/support/Bounds.ts';
 
 export class CanvasView {
   #gameCanvas: HTMLCanvasElement;
@@ -22,12 +22,11 @@ export class CanvasView {
     this.#gameCanvasContext = context;
   }
 
-  get canvasWidth() {
-    return this.#gameCanvas.width;
-  }
-
-  get canvasHeight() {
-    return this.#gameCanvas.height;
+  get bounds(): Bounds {
+    return {
+      height: this.#gameCanvas.height,
+      width: this.#gameCanvas.width
+    };
   }
 
   resizeCanvas() {
@@ -52,21 +51,5 @@ export class CanvasView {
     this.#gameCanvasContext.fill();
     this.#gameCanvasContext.stroke();
     this.#gameCanvasContext.closePath();
-  }
-
-  isInsideCanvas(tile: Tile): boolean {
-    // these two corners are enough to cover all possible ways to exit the canvas
-    const tileCorners: Array<Coordinates> = [tile.topLeftCorner, tile.bottomRightCorner];
-
-    for (const corner of tileCorners) {
-      const isHorizontallyInside = corner.x >= 0 && corner.x <= this.#gameCanvas.width;
-      const isVerticallyInside = corner.y >= 0 && corner.y <= this.#gameCanvas.height;
-
-      if (!isHorizontallyInside || !isVerticallyInside) {
-        return false;
-      }
-    }
-
-    return true;
   }
 }

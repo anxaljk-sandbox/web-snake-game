@@ -1,5 +1,5 @@
-import { TileType } from './TileType.ts';
-import type { Coordinates } from './Coordinates.ts';
+import { TileType } from './support/TileType.ts';
+import type { Coordinates } from './support/Coordinates.ts';
 
 export class Tile {
   static readonly #DEFAULT_TILE_SIZE = 70;

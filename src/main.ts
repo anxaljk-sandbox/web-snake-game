@@ -18,7 +18,8 @@ window.addEventListener('resize', () => {
 });
 
 document.addEventListener('keydown', (event) => {
-  snakeGameController.handleKeyDown(event);
+  if (event.repeat) return;
+  snakeGameController.handleKeyDown(event.key);
 });
 
 main();
