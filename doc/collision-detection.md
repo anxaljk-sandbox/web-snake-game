@@ -1,6 +1,6 @@
 # Collision Detection
 
-## Snake eats food — [`overlapsCoordinate`](./../src/controller/collision-utils.ts)
+## Snake eats food — [`overlapsCoordinate`](../src/model/support/collision.ts)
 
 Food counts as "eaten" once the snake touches its center (which means around 25% - 50% of the food are covered by the snake).
 
@@ -8,7 +8,7 @@ How one can find out when the center (a specific coordinate) is covered by the s
 
 <img alt="overlapping coordinates explanation" height="600" width="auto" src="./resources/overlapping-coordinates-explanation.png">
 
-## Snake stays inside the playable field — [`isInsideCanvas`](./../src/view/CanvasView.ts)
+## Snake stays inside the playable field — [`isInsideCanvas`](../src/model/support/collision.ts)
 
 The snake is not allowed to leave the playable field — the canvas.
 
@@ -18,7 +18,7 @@ How the calculation works, is explained in the image below:
 
 <img alt="overlapping walls explanation" height="600" width="auto" src="./resources/overlapping-walls-explanation.png">
 
-## Snake collides with itself — [`overlapsTile`](./../src/controller/collision-utils.ts)
+## Snake collides with itself — [`overlapsTile`](../src/model/support/collision.ts)
 
 A snake is not allowed to collide with itself.
 
