@@ -27,23 +27,41 @@ export class Path {
     let pathElement = this.#getPathElementAt(coordinates);
     if (!pathElement) return;
 
-    let x = coordinates.x;
-    let y = coordinates.y;
-
-    for (let i = 0; i < distance; i++) {
-      const direction = forward ? pathElement.direction : oppositeDirection[pathElement.direction];
-      const delta = directionDeltas[direction];
-
-      x += delta.x;
-      y += delta.y;
-
-      const corner = forward ? pathElement.to : pathElement.from;
-      if (corner?.x === x && corner?.y === y) {
-        pathElement = (forward ? this.#next(pathElement) : this.#previous(pathElement)) ?? pathElement;
-      }
+    const points = this.getPointsFrom(coordinates, distance, forward);
+    if (points) {
+      return points[points.length - 1];
     }
+  }
 
-    return { x, y };
+  getPointsFrom(coordinates: Coordinates, distance: number, forward: boolean) {
+    let pathElement = this.#getPathElementAt(coordinates);
+    if (!pathElement) return;
+
+    const points = [coordinates];
+    let current = coordinates;
+    let remaining = distance;
+
+    while (remaining > 0 && pathElement) {
+      const corner = forward ? pathElement.to : pathElement.from;
+      const distanceToCorner = Math.abs(corner.x - current.x) + Math.abs(corner.y - current.y);
+
+      if (distanceToCorner === 0) {
+        pathElement = forward ? this.#next(pathElement) : this.#previous(pathElement);
+        continue;
+      }
+
+      if (distanceToCorner >= remaining) {
+        const delta = forward ? directionDeltas[pathElement.direction] : directionDeltas[oppositeDirection[pathElement.direction]];
+        points.push({ x: current.x + delta.x * remaining, y: current.y + delta.y * remaining });
+        return points;
+      }
+
+      points.push(corner);
+      remaining -= distanceToCorner;
+      current = corner;
+      pathElement = forward ? this.#next(pathElement) : this.#previous(pathElement);
+    }
+    return points;
   }
 
   #getPathElementAt(coordinates: Coordinates) {

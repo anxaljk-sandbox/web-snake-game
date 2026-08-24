@@ -41,7 +41,7 @@ export class Snake {
     this.#snakeEyes = snakeEyes;
 
     this.#path = new Path();
-    this.turn(this.#currentDirection)
+    this.turn(this.#currentDirection);
   }
 
   get head() {
@@ -78,14 +78,14 @@ export class Snake {
   }
 
   move() {
-    this.#moveHead()
+    this.#moveHead();
 
     for (let i = 1; i < this.length; i++) {
       const newPosition = this.#path.getPositionFrom(
         { x: this.body[i].xPosition, y: this.body[i].yPosition },
         Snake.#SNAKE_SPEED,
         true
-      )
+      );
 
       if (newPosition !== undefined) {
         this.body[i].xPosition = newPosition.x;
@@ -110,9 +110,27 @@ export class Snake {
     return this.#snakeEyes;
   }
 
+  getRenderPoints() {
+    const renderPoints = this.#path.getPointsFrom(
+      { x: this.head.xPosition, y: this.head.yPosition },
+      (this.length - 1) * this.head.size,
+      false
+    );
+
+    if (renderPoints === undefined) {
+      return [];
+    } else {
+      return renderPoints.map(pathCorner => this.#toTileCenter(pathCorner));
+    }
+  }
+
   #moveHead() {
     const delta = directionDeltas[this.#currentDirection];
     this.head.xPosition += delta.x * Snake.#SNAKE_SPEED;
     this.head.yPosition += delta.y * Snake.#SNAKE_SPEED;
+  }
+
+  #toTileCenter(topLeftCorner: Coordinates): Coordinates {
+    return { x: topLeftCorner.x + this.head.radius, y: topLeftCorner.y + this.head.radius };
   }
 }
