@@ -53,8 +53,8 @@ export class SnakeGameController {
   handleKeyDown(key: string) {
     const newDirection = SnakeGameController.#KEY_TO_DIRECTION[key];
 
-    if (newDirection === undefined || newDirection === oppositeDirection[this.#snake.direction]) return
-    if (newDirection === this.#snake.direction && this.#isMoving) return
+    if (newDirection === undefined || newDirection === oppositeDirection[this.#snake.direction]) return;
+    if (newDirection === this.#snake.direction && this.#isMoving) return;
 
     this.#pendingDirection = newDirection;
     this.#isMoving = true;
@@ -71,22 +71,21 @@ export class SnakeGameController {
   }
 
   #drawSnake() {
-    for (let tile of this.#snake.body) {
-      this.#canvasView.drawRectangle('black', tile);
-    }
+    this.#canvasView.drawPolyline('black', this.#snake.getRenderPoints(), this.#snake.head.size);
+
     for (let eye of this.#snake.getSnakeEyes()) {
       this.#canvasView.drawRectangle('white', eye);
     }
   }
 
   #moveSnake() {
-    this.#applyPendingDirection()
+    this.#applyPendingDirection();
 
     this.#snake.move();
   }
 
   #applyPendingDirection() {
-    if (this.#pendingDirection === undefined) return
+    if (this.#pendingDirection === undefined) return;
 
     this.#snake.turn(this.#pendingDirection);
     this.#pendingDirection = undefined;
@@ -110,7 +109,7 @@ export class SnakeGameController {
 
     // Handle snake eating food
     if (overlapsCoordinate(head, this.#currentFood.xPosition, this.#currentFood.yPosition)) {
-      this.#generateNewFood()
+      this.#generateNewFood();
     }
   }
 

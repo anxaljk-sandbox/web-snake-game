@@ -3,6 +3,6 @@ import type { Direction } from './Direction.ts';
 
 export type PathElement = {
   from: Coordinates;
-  to?: Coordinates;
+  to: Coordinates;
   direction: Direction;
 }
