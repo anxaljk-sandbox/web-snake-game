@@ -4,11 +4,14 @@ import type { Coordinates } from '../model/support/Coordinates.ts';
 import type { ScoreValues } from '../model/Score.ts';
 
 export class CanvasView {
-  #gameCanvas: HTMLCanvasElement;
-  #gameCanvasContainer: HTMLElement;
-  #gameCanvasContext: CanvasRenderingContext2D;
-  #scoreValue: HTMLElement;
-  #highScoreValue: HTMLElement;
+  static readonly #GAME_OVER_VISIBLE_CLASS = 'game-over-screen--visible';
+
+  readonly #gameCanvas: HTMLCanvasElement;
+  readonly #gameCanvasContainer: HTMLElement;
+  readonly #gameCanvasContext: CanvasRenderingContext2D;
+  readonly #scoreValue: HTMLElement;
+  readonly #highScoreValue: HTMLElement;
+  readonly #gameOverScreen: HTMLElement;
 
   constructor(gameCanvas: HTMLCanvasElement) {
     const context = gameCanvas.getContext('2d');
@@ -31,11 +34,17 @@ export class CanvasView {
       throw new Error('Could not get the high score value HTML element');
     }
 
+    const gameOverScreen = document.getElementById('game-over-screen');
+    if (!gameOverScreen) {
+      throw new Error('Could not get the game over screen');
+    }
+
     this.#gameCanvas = gameCanvas;
     this.#gameCanvasContainer = container;
     this.#gameCanvasContext = context;
     this.#scoreValue = scoreValue;
     this.#highScoreValue = highScoreValue;
+    this.#gameOverScreen = gameOverScreen;
   }
 
   get bounds(): Bounds {
@@ -91,8 +100,31 @@ export class CanvasView {
     }
   }
 
-  updateScores(values: ScoreValues) {
-    this.#scoreValue.innerText = values.score.toString();
-    this.#highScoreValue.innerText = values.highScore.toString();
+  updateScores(scoreValues: ScoreValues) {
+    this.#scoreValue.innerText = scoreValues.score.toString();
+    this.#highScoreValue.innerText = scoreValues.highScore.toString();
+  }
+
+  showGameOverScreen(reason: string, scoreValues?: ScoreValues) {
+    this.#gameOverScreen.classList.add(CanvasView.#GAME_OVER_VISIBLE_CLASS);
+
+    const gameOverReason = document.getElementById('game-over-reason');
+    const scoreValue = document.getElementById('game-over-score-value');
+    const highScoreValue = document.getElementById('game-over-high-score-value');
+
+    if (gameOverReason && scoreValue && highScoreValue) {
+      gameOverReason.innerText = reason;
+      if (scoreValues) {
+        scoreValue.innerText = scoreValues.score.toString();
+        highScoreValue.innerText = scoreValues.highScore.toString();
+      } else {
+        scoreValue.innerText = this.#scoreValue.innerText;
+        highScoreValue.innerText = this.#highScoreValue.innerText;
+      }
+    }
+  }
+
+  hideGameOverScreen() {
+    this.#gameOverScreen.classList.remove(CanvasView.#GAME_OVER_VISIBLE_CLASS);
   }
 }

@@ -6,6 +6,7 @@ import { TileType } from '../model/support/TileType.ts';
 import type { CanvasView } from '../view/CanvasView.ts';
 import { isInsideBounds, overlapsCoordinate, overlapsTile } from '../model/support/collision.ts';
 import { getCoordinatesOfRandomFreeTile } from '../model/support/placement.ts';
+import type { Coordinates } from '../model/support/Coordinates.ts';
 
 export class SnakeGameController {
   static readonly #KEY_TO_DIRECTION: Record<string, Direction> = {
@@ -18,23 +19,33 @@ export class SnakeGameController {
   readonly #canvasView: CanvasView;
   readonly #currentFood: Tile;
   readonly #score: Score;
+  readonly #initialSnakePosition: Coordinates;
+  readonly #initialFoodPosition: Coordinates;
 
   #snake: Snake;
-  #isMoving = false;
   #pendingDirection: Direction | undefined;
+  #isMoving = false;
+  #gameOver = false;
 
-  constructor(canvasView: CanvasView, xStartingPoint: number, yStartingPoint: number) {
+  constructor(canvasView: CanvasView) {
     this.#canvasView = canvasView;
 
-    this.#snake = new Snake(xStartingPoint, yStartingPoint);
+    this.#initialSnakePosition = { x: 200, y: this.#canvasView.bounds.height / 2 };
 
-    this.#currentFood = new Tile(
-      TileType.Circle,
-      this.#canvasView.bounds.width - xStartingPoint,
-      yStartingPoint + this.#snake.head.radius
-    );
+    this.#snake = new Snake(this.#initialSnakePosition);
+
+    this.#initialFoodPosition = {
+      x: this.#canvasView.bounds.width - this.#initialSnakePosition.x,
+      y: this.#initialSnakePosition.y + this.#snake.head.radius,
+    };
+
+    this.#currentFood = new Tile(TileType.Circle, this.#initialFoodPosition.x, this.#initialFoodPosition.y);
 
     this.#score = new Score();
+  }
+
+  get isGameInProgress() {
+    return !this.#gameOver && this.#isMoving;
   }
 
   play() {
@@ -57,13 +68,25 @@ export class SnakeGameController {
   }
 
   handleKeyDown(key: string) {
-    const newDirection = SnakeGameController.#KEY_TO_DIRECTION[key];
+    if (this.#gameOver && key === 'Enter') {
+      this.#restart();
+    }
 
-    if (newDirection === undefined || newDirection === oppositeDirection[this.#snake.direction]) return;
-    if (newDirection === this.#snake.direction && this.#isMoving) return;
+    if (!this.#gameOver) {
+      const newDirection = SnakeGameController.#KEY_TO_DIRECTION[key];
 
-    this.#pendingDirection = newDirection;
-    this.#isMoving = true;
+      if (newDirection === undefined || newDirection === oppositeDirection[this.#snake.direction]) return;
+      if (newDirection === this.#snake.direction && this.#isMoving) return;
+
+      this.#pendingDirection = newDirection;
+      this.#isMoving = true;
+    }
+  }
+
+  stopGame(reason: string) {
+    this.#isMoving = false;
+    this.#gameOver = true;
+    this.#canvasView.showGameOverScreen(reason, this.#score.values);
   }
 
   #placeFoodOnCanvas(xPosition?: number, yPosition?: number) {
@@ -100,20 +123,17 @@ export class SnakeGameController {
   #handleEvents() {
     const head = this.#snake.head;
 
-    // Handle crash into the wall
     if (!isInsideBounds(head, this.#canvasView.bounds)) {
-      this.#isMoving = false;
+      this.stopGame('You crashed into a wall!');
       return;
     }
 
-    // handle snake crashing into itself
     for (let i = 2; i < this.#snake.length; i++) {
       if (overlapsTile(head, this.#snake.body[i])) {
-        this.#isMoving = false;
+        this.stopGame('You crashed into yourself!');
       }
     }
 
-    // Handle snake eating food
     if (overlapsCoordinate(head, this.#currentFood.xPosition, this.#currentFood.yPosition)) {
       this.#onFoodEaten();
     }
@@ -123,10 +143,11 @@ export class SnakeGameController {
     const newFoodCoordinates = getCoordinatesOfRandomFreeTile(
       this.#currentFood.size,
       this.#currentFood.tileType,
-      this.#canvasView.bounds, this.#snake.body
+      this.#canvasView.bounds,
+      this.#snake.body
     );
     if (newFoodCoordinates === undefined) {
-      this.#isMoving = false;
+      this.stopGame('You have eaten so much, that there is no more space for new food! Congratulations!');
     } else {
       this.#snake.grow();
       this.#placeFoodOnCanvas(newFoodCoordinates.x, newFoodCoordinates.y);
@@ -136,5 +157,14 @@ export class SnakeGameController {
   #updateScore() {
     this.#score.updateScore(this.#snake.length - 1);
     this.#canvasView.updateScores(this.#score.values);
+  }
+
+  #restart() {
+    this.#snake = new Snake(this.#initialSnakePosition);
+    this.#placeFoodOnCanvas(this.#initialFoodPosition.x, this.#initialFoodPosition.y);
+    this.#pendingDirection = undefined;
+    this.#isMoving = false;
+    this.#gameOver = false;
+    this.#canvasView.hideGameOverScreen();
   }
 }
