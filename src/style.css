@@ -5,6 +5,7 @@
   --color-line: #dfe3d8;
   --color-panel: #ffffff;
   --color-screen: #b8c6a3;
+  --color-overlay: rgb(27 29 25 / 88%);
 
   --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
 
@@ -48,6 +49,10 @@ body {
   line-height: 1;
 }
 
+.title--compact {
+  font-size: clamp(1.75rem, 4vw, 2.5rem);
+}
+
 .title__glyph {
   display: inline-block;
   width: 0.875em;
@@ -68,6 +73,10 @@ body {
   font-size: 0.9375rem;
   font-weight: 400;
   color: var(--color-muted);
+}
+
+.hint--center {
+  justify-content: center;
 }
 
 .key {
@@ -93,6 +102,12 @@ body {
   background: var(--color-panel);
   border: 1px solid var(--color-line);
   border-radius: var(--radius-panel);
+}
+
+.score-panel--card {
+  min-width: 0;
+  width: 100%;
+  background: var(--color-bg);
 }
 
 .score-panel__row {
@@ -148,4 +163,69 @@ body {
 
 #game-canvas {
   display: block;
+}
+
+.game-over-screen {
+  --color-ink: #f4f5f1;
+  --color-muted: #99a394;
+  --color-line: rgb(244 245 241 / 20%);
+  --color-panel: rgb(244 245 241 / 12%);
+  --color-bg: rgb(244 245 241 / 7%);
+
+  z-index: 10;
+  position: fixed;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: var(--space-page);
+  background: var(--color-overlay);
+  backdrop-filter: blur(3px);
+  color: var(--color-ink);
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 180ms ease, visibility 180ms ease;
+}
+
+.game-over-screen--visible {
+  opacity: 1;
+  visibility: visible;
+}
+
+.game-over-card {
+  width: min(420px, 100%);
+  padding: clamp(24px, 4vw, 34px);
+  text-align: center;
+  transform: translateY(10px) scale(0.98);
+  transition: transform 180ms ease;
+}
+
+.game-over-screen--visible .game-over-card {
+  transform: none;
+}
+
+.game-over-reason {
+  margin: 10px 0 0;
+  font-size: 0.9375rem;
+  color: var(--color-muted);
+}
+
+.game-over-card .score-panel {
+  margin-top: 22px;
+  text-align: left;
+}
+
+.game-over-card .hint {
+  margin-top: 20px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .game-over-screen,
+  .game-over-card {
+    transition: none;
+  }
+
+  .game-over-card {
+    transform: none;
+  }
 }

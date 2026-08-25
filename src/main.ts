@@ -8,12 +8,14 @@ let snakeGameController: SnakeGameController;
 function main() {
   canvasView.resizeCanvas();
 
-  snakeGameController = new SnakeGameController(canvasView, 200, gameCanvas.height / 2);
+  snakeGameController = new SnakeGameController(canvasView);
   snakeGameController.play();
 }
 
-// giving the bare reference to canvasView.resizeCanvas would grab the function itself and detach it from CanvasView, so this becomes undefined
 window.addEventListener('resize', () => {
+  if (snakeGameController.isGameInProgress) {
+    snakeGameController.stopGame('The screen has been resized during the game!');
+  }
   canvasView.resizeCanvas();
 });
 

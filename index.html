@@ -1,21 +1,21 @@
 <!doctype html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <link rel="preconnect" href="https://fonts.googleapis.com" />
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" />
-    <link rel="stylesheet" type="text/css" href="/src/style.css" />
-    <script type="module" src="src/main.ts" defer></script>
+    <meta charset="UTF-8"/>
+    <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+    <link href="/favicon.svg" rel="icon" type="image/svg+xml"/>
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600&display=swap" rel="stylesheet"/>
+    <link href="/src/style.css" rel="stylesheet" type="text/css"/>
+    <script defer src="src/main.ts" type="module"></script>
     <title>Snake Game</title>
 </head>
 <body>
     <header class="app-header">
         <div class="app-header__intro">
-            <h1 class="title" aria-label="Snake">
-                <span class="title__glyph" aria-hidden="true"></span><span aria-hidden="true">nake</span>
+            <h1 aria-label="Snake" class="title">
+                <span aria-hidden="true" class="title__glyph"></span><span aria-hidden="true">nake</span>
             </h1>
             <p class="hint">
                 Use the
@@ -39,5 +39,25 @@
     <main class="game-area">
         <canvas id="game-canvas"></canvas>
     </main>
+
+    <div aria-labelledby="game-over-title" class="game-over-screen" id="game-over-screen" role="dialog">
+        <div class="game-over-card">
+            <h2 class="title title--compact" id="game-over-title">Game Over</h2>
+            <p class="game-over-reason" id="game-over-reason"></p>
+
+            <div class="score-panel score-panel--card">
+                <div class="score-panel__row">
+                    <span class="score-panel__label">Score</span>
+                    <span class="score-panel__value" id="game-over-score-value">0</span>
+                </div>
+                <div class="score-panel__row score-panel__row--sub">
+                    <span class="score-panel__label score-panel__label--sub">Best</span>
+                    <span class="score-panel__value score-panel__value--sub" id="game-over-high-score-value">0</span>
+                </div>
+            </div>
+
+            <p class="hint hint--center">press <kbd class="key">Enter</kbd> to retry</p>
+        </div>
+    </div>
 </body>
 </html>

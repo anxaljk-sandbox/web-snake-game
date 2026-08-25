@@ -31,8 +31,8 @@ export class Snake {
   readonly #path: Path;
   #currentDirection = Direction.Right;
 
-  constructor(xStartingPoint: number, yStartingPoint: number) {
-    this.body = [new Tile(TileType.Square, xStartingPoint, yStartingPoint)];
+  constructor(startingPoint: Coordinates) {
+    this.body = [new Tile(TileType.Square, startingPoint.x, startingPoint.y)];
 
     let snakeEyes: Array<Tile> = [];
     for (let i = 0; i <= 1; i++) {
