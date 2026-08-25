@@ -1,6 +1,11 @@
-import type { PathElement } from './support/PathElement.ts';
 import type { Coordinates } from './support/Coordinates.ts';
 import { Direction, directionDeltas, oppositeDirection } from './support/Direction.ts';
+
+type PathElement = {
+  from: Coordinates;
+  to: Coordinates;
+  direction: Direction;
+}
 
 export class Path {
   readonly #pathElements: Array<PathElement>;

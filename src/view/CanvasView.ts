@@ -1,11 +1,14 @@
 import type { Tile } from '../model/Tile.ts';
 import type { Bounds } from '../model/support/Bounds.ts';
 import type { Coordinates } from '../model/support/Coordinates.ts';
+import type { ScoreValues } from '../model/Score.ts';
 
 export class CanvasView {
   #gameCanvas: HTMLCanvasElement;
   #gameCanvasContainer: HTMLElement;
   #gameCanvasContext: CanvasRenderingContext2D;
+  #scoreValue: HTMLElement;
+  #highScoreValue: HTMLElement;
 
   constructor(gameCanvas: HTMLCanvasElement) {
     const context = gameCanvas.getContext('2d');
@@ -18,9 +21,21 @@ export class CanvasView {
       throw new Error('The game canvas must be nested inside a container element');
     }
 
+    const scoreValue = document.getElementById('score-value');
+    if (!scoreValue) {
+      throw new Error('Could not get the score value HTML element');
+    }
+
+    const highScoreValue = document.getElementById('high-score-value');
+    if (!highScoreValue) {
+      throw new Error('Could not get the high score value HTML element');
+    }
+
     this.#gameCanvas = gameCanvas;
     this.#gameCanvasContainer = container;
     this.#gameCanvasContext = context;
+    this.#scoreValue = scoreValue;
+    this.#highScoreValue = highScoreValue;
   }
 
   get bounds(): Bounds {
@@ -74,5 +89,10 @@ export class CanvasView {
       }
       this.#gameCanvasContext.stroke();
     }
+  }
+
+  updateScores(values: ScoreValues) {
+    this.#scoreValue.innerText = values.score.toString();
+    this.#highScoreValue.innerText = values.highScore.toString();
   }
 }
