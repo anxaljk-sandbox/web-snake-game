@@ -1,8 +1,9 @@
 import { Direction, oppositeDirection } from '../model/support/Direction.ts';
 import { Snake } from '../model/Snake.ts';
 import { Tile } from '../model/Tile.ts';
-import type { CanvasView } from '../view/CanvasView.ts';
+import { Score } from '../model/Score.ts';
 import { TileType } from '../model/support/TileType.ts';
+import type { CanvasView } from '../view/CanvasView.ts';
 import { isInsideBounds, overlapsCoordinate, overlapsTile } from '../model/support/collision.ts';
 import { getCoordinatesOfRandomFreeTile } from '../model/support/placement.ts';
 
@@ -16,6 +17,7 @@ export class SnakeGameController {
 
   readonly #canvasView: CanvasView;
   readonly #currentFood: Tile;
+  readonly #score: Score;
 
   #snake: Snake;
   #isMoving = false;
@@ -31,6 +33,8 @@ export class SnakeGameController {
       this.#canvasView.bounds.width - xStartingPoint,
       yStartingPoint + this.#snake.head.radius
     );
+
+    this.#score = new Score();
   }
 
   play() {
@@ -44,6 +48,8 @@ export class SnakeGameController {
     }
 
     this.#handleEvents();
+
+    this.#updateScore();
 
     // Passing this.play() would invoke it immediately and pass its void return value,
     // requestAnimationFrame, however, needs a function reference, not a call.
@@ -109,11 +115,11 @@ export class SnakeGameController {
 
     // Handle snake eating food
     if (overlapsCoordinate(head, this.#currentFood.xPosition, this.#currentFood.yPosition)) {
-      this.#generateNewFood();
+      this.#onFoodEaten();
     }
   }
 
-  #generateNewFood() {
+  #onFoodEaten() {
     const newFoodCoordinates = getCoordinatesOfRandomFreeTile(
       this.#currentFood.size,
       this.#currentFood.tileType,
@@ -125,5 +131,10 @@ export class SnakeGameController {
       this.#snake.grow();
       this.#placeFoodOnCanvas(newFoodCoordinates.x, newFoodCoordinates.y);
     }
+  }
+
+  #updateScore() {
+    this.#score.updateScore(this.#snake.length - 1);
+    this.#canvasView.updateScores(this.#score.values);
   }
 }

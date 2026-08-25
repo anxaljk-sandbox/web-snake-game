@@ -54,6 +54,7 @@ That's why I added the `support` folder inside my `model` folder.
 It's not textbook MVC anymore, but I think it's the honest solution: those helpers have to live somewhere. 
 I put them under `model` and not under `controller` because they answer questions about the game world itself, like: "do these two tiles overlap?", "is this coordinate still on the field?", "where can a new food tile go?". 
 That's domain logic, not input handling, so the model was the closer neighbour.
+Another important thing about the `support` folder is that it's shared and used across multiple files.
 
 ## Project structure
 
