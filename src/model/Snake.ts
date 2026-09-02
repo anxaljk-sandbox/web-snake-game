@@ -42,6 +42,7 @@ export class Snake {
 
     this.#path = new Path();
     this.turn(this.#currentDirection);
+    this.#fitPathToBody();
   }
 
   get head() {
@@ -75,6 +76,8 @@ export class Snake {
     if (position !== undefined) {
       this.body.push(new Tile(this.tail.tileType, position.x, position.y));
     }
+
+    this.#fitPathToBody();
   }
 
   move() {
@@ -96,6 +99,7 @@ export class Snake {
     }
 
     this.#path.extendTo({ x: this.head.xPosition, y: this.head.yPosition });
+    this.#fitPathToBody();
   }
 
   getSnakeEyes() {
@@ -130,6 +134,10 @@ export class Snake {
       .map((corner) => {
         return new Tile(TileType.Square, corner.x - this.head.radius, corner.y - this.head.radius, this.head.size)
       });
+  }
+
+  #fitPathToBody() {
+    this.#path.setLength(this.length * this.head.size);
   }
 
   #moveHead() {

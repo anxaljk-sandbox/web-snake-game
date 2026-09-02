@@ -28,6 +28,32 @@ export class Path {
     });
   }
 
+  setLength(length: number) {
+    let remaining = length;
+
+    for (let i = this.#pathElements.length - 1; i >= 0; i--) {
+      const pathElement = this.#pathElements[i];
+      const elementLength = this.#distanceBetween(pathElement.from, pathElement.to);
+
+      if (elementLength < remaining) {
+        remaining -= elementLength;
+        continue;
+      }
+
+      const startOfPath = this.#movePoint(pathElement.to, oppositeDirection[pathElement.direction], remaining);
+      this.#pathElements.splice(0, i + 1, { ...pathElement, from: startOfPath, });
+      return;
+    }
+
+    const oldestElement = this.#pathElements[0];
+    if (!oldestElement) return;
+
+    this.#pathElements[0] = {
+      ...oldestElement,
+      from: this.#movePoint(oldestElement.from, oppositeDirection[oldestElement.direction], remaining),
+    };
+  }
+
   getPositionFrom(coordinates: Coordinates, distance: number, forward: boolean): Coordinates | undefined {
     let pathElement = this.#getPathElementAt(coordinates);
     if (!pathElement) return;
@@ -48,7 +74,7 @@ export class Path {
 
     while (remaining > 0 && pathElement) {
       const corner = forward ? pathElement.to : pathElement.from;
-      const distanceToCorner = Math.abs(corner.x - current.x) + Math.abs(corner.y - current.y);
+      const distanceToCorner = this.#distanceBetween(current, corner);
 
       if (distanceToCorner === 0) {
         pathElement = forward ? this.#next(pathElement) : this.#previous(pathElement);
@@ -56,8 +82,8 @@ export class Path {
       }
 
       if (distanceToCorner >= remaining) {
-        const delta = forward ? directionDeltas[pathElement.direction] : directionDeltas[oppositeDirection[pathElement.direction]];
-        points.push({ x: current.x + delta.x * remaining, y: current.y + delta.y * remaining });
+        const direction = forward ? pathElement.direction : oppositeDirection[pathElement.direction];
+        points.push(this.#movePoint(current, direction, remaining));
         return points;
       }
 
@@ -67,6 +93,19 @@ export class Path {
       pathElement = forward ? this.#next(pathElement) : this.#previous(pathElement);
     }
     return points;
+  }
+
+  #distanceBetween(pointA: Coordinates, pointB: Coordinates) {
+    return Math.abs(pointB.x - pointA.x) + Math.abs(pointB.y - pointA.y);
+  }
+
+  #movePoint(point: Coordinates, direction: Direction, distance: number): Coordinates {
+    const delta = directionDeltas[direction];
+
+    return {
+      x: point.x + delta.x * distance,
+      y: point.y + delta.y * distance,
+    };
   }
 
   #getPathElementAt(coordinates: Coordinates) {
