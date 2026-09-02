@@ -2,6 +2,10 @@ import type { Bounds } from './Bounds.ts';
 import { Tile } from '../Tile.ts';
 import type { Coordinates } from './Coordinates.ts';
 
+export function overlapsAnyTile(tiles: Array<Tile>, tile: Tile) {
+  return tiles.some((other) => overlapsTile(other, tile));
+}
+
 export function overlapsTile(tileA: Tile, tileB: Tile) {
   const overlapX =
     Math.min(tileA.topRightCorner.x, tileB.topRightCorner.x) -

@@ -140,16 +140,22 @@ export class SnakeGameController {
   }
 
   #onFoodEaten() {
+    this.#snake.grow();
+
+    const occupiedTiles = [
+      ...this.#snake.body,
+      ...this.#snake.getCornerTiles()
+    ]
+
     const newFoodCoordinates = getCoordinatesOfRandomFreeTile(
       this.#currentFood.size,
       this.#currentFood.tileType,
       this.#canvasView.bounds,
-      this.#snake.body
+      occupiedTiles,
     );
     if (newFoodCoordinates === undefined) {
       this.stopGame('You have eaten so much, that there is no more space for new food! Congratulations!');
     } else {
-      this.#snake.grow();
       this.#placeFoodOnCanvas(newFoodCoordinates.x, newFoodCoordinates.y);
     }
   }
