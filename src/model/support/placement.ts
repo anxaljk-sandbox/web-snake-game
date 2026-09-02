@@ -1,6 +1,6 @@
 import { Tile } from '../Tile.ts';
 import { TileType } from './TileType.ts';
-import { overlapsTile } from './collision.ts';
+import { overlapsAnyTile } from './collision.ts';
 import type { Bounds } from './Bounds.ts';
 import type { Coordinates } from './Coordinates.ts';
 
@@ -11,10 +11,10 @@ export function getCoordinatesOfRandomFreeTile(size: number, tileType: TileType,
 
   for (let attempt = 0; attempt < maxPlacementAttempts; attempt++) {
     const randomTile = getRandomTile(size, tileType, bounds);
-
-    const isFree = occupied.every((tile) => !overlapsTile(randomTile, tile));
-
-    if (isFree) return { x: randomTile.xPosition, y: randomTile.yPosition };
+    
+    if (!overlapsAnyTile(occupied, randomTile)) {
+      return { x: randomTile.xPosition, y: randomTile.yPosition };
+    }
   }
 }
 

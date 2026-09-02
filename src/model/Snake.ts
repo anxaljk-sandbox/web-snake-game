@@ -124,6 +124,14 @@ export class Snake {
     }
   }
 
+  getCornerTiles(): Array<Tile> {
+    return this.getRenderPoints()
+      .slice(1, -1)
+      .map((corner) => {
+        return new Tile(TileType.Square, corner.x - this.head.radius, corner.y - this.head.radius, this.head.size)
+      });
+  }
+
   #moveHead() {
     const delta = directionDeltas[this.#currentDirection];
     this.head.xPosition += delta.x * Snake.#SNAKE_SPEED;
