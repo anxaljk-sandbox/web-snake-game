@@ -15,81 +15,93 @@ const gameCanvas = document.getElementById('game-canvas')! as HTMLCanvasElement;
 const gameOverScreen = document.getElementById('game-over-screen')!;
 
 const canvasView = new CanvasView(gameCanvas, gameOverScreen);
-let snakeGameController: SnakeGameController;
 
-let swipeDetected = false;
-let touchStart: Coordinates = { x: 0, y: 0 };
+async function main() {
+  await waitForFontsToLoad();
 
-function main() {
   canvasView.resizeCanvas();
 
-  snakeGameController = new SnakeGameController(canvasView);
+  const snakeGameController = new SnakeGameController(canvasView);
+
+  registerInputHandlers(snakeGameController);
+  observeGameAreaResize(snakeGameController);
+
   snakeGameController.play();
 }
 
-window.addEventListener('resize', () => {
-  // Mobile browsers fire resize when the URL bar slides away, without changing the layout.
-  if (!canvasView.hasContainerSizeChanged) return;
+function waitForFontsToLoad() {
+  return Promise.race([
+    document.fonts.ready,
+    new Promise((resolve) => setTimeout(resolve, 500)),
+  ]);
+}
 
-  if (snakeGameController.isGameInProgress) {
-    snakeGameController.stopGame('The screen has been resized during the game!');
-  }
-  canvasView.resizeCanvas();
-});
+function registerInputHandlers(snakeGameController: SnakeGameController) {
+  let swipeDetected = false;
+  let touchStart: Coordinates = { x: 0, y: 0 };
 
-document.addEventListener('keydown', (event) => {
-  if (event.repeat) return;
+  document.addEventListener('keydown', (event) => {
+    if (event.repeat) return;
 
-  if (event.key === 'Enter') snakeGameController.handleRestartInput();
+    if (event.key === 'Enter') snakeGameController.handleRestartInput();
 
-  const direction = KEY_TO_DIRECTION[event.key];
-  if (direction === undefined) return;
+    const direction = KEY_TO_DIRECTION[event.key];
+    if (direction === undefined) return;
 
-  snakeGameController.handleDirectionInput(direction);
-});
+    snakeGameController.handleDirectionInput(direction);
+  });
 
-gameOverScreen.addEventListener('touchend', () => {
-  snakeGameController.handleRestartInput();
-})
+  gameOverScreen.addEventListener('touchend', () => {
+    snakeGameController.handleRestartInput();
+  });
 
-gameCanvas.addEventListener('touchstart', (event) => {
-  const touch = event.touches[0];
+  gameCanvas.addEventListener('touchstart', (event) => {
+    const touch = event.touches[0];
 
-  touchStart = {
-    x: touch.clientX,
-    y: touch.clientY,
-  };
+    touchStart = {
+      x: touch.clientX,
+      y: touch.clientY,
+    };
 
-  swipeDetected = false;
-});
+    swipeDetected = false;
+  });
 
-gameCanvas.addEventListener('touchmove', (event) => {
-  if (swipeDetected) return;
+  gameCanvas.addEventListener('touchmove', (event) => {
+    if (swipeDetected) return;
 
-  const touch = event.touches[0];
+    const touch = event.touches[0];
 
-  const deltaX = touch.clientX - touchStart.x;
-  const deltaY = touch.clientY - touchStart.y;
+    const deltaX = touch.clientX - touchStart.x;
+    const deltaY = touch.clientY - touchStart.y;
 
-  if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < MIN_SWIPE_LENGTH) {
-    return;
-  }
+    if (Math.max(Math.abs(deltaX), Math.abs(deltaY)) < MIN_SWIPE_LENGTH) {
+      return;
+    }
 
-  swipeDetected = true;
+    swipeDetected = true;
 
-  let direction: Direction;
+    let direction: Direction;
 
-  if (Math.abs(deltaX) > Math.abs(deltaY)) {
-    direction = deltaX > 0 ? Direction.Right : Direction.Left;
-  } else {
-    direction = deltaY > 0 ? Direction.Down : Direction.Up;
-  }
+    if (Math.abs(deltaX) > Math.abs(deltaY)) {
+      direction = deltaX > 0 ? Direction.Right : Direction.Left;
+    } else {
+      direction = deltaY > 0 ? Direction.Down : Direction.Up;
+    }
 
-  snakeGameController.handleDirectionInput(direction);
-});
+    snakeGameController.handleDirectionInput(direction);
+  });
 
-gameCanvas.addEventListener('touchend', () => {
-  swipeDetected = false;
-});
+  gameCanvas.addEventListener('touchend', () => {
+    swipeDetected = false;
+  });
+}
+
+function observeGameAreaResize(snakeGameController: SnakeGameController) {
+  new ResizeObserver(() => {
+    if (!canvasView.hasContainerSizeChanged) return;
+    canvasView.resizeCanvas();
+    snakeGameController.handleResize();
+  }).observe(canvasView.gameCanvasContainer);
+}
 
 main();

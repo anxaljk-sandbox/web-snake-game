@@ -5,6 +5,7 @@ import type { ScoreValues } from '../model/Score.ts';
 
 export class CanvasView {
   static readonly #GAME_OVER_VISIBLE_CLASS = 'game-over-screen--visible';
+  static readonly #START_HINT_HIDDEN_CLASS = 'start-hint--hidden';
 
   readonly #gameCanvas: HTMLCanvasElement;
   readonly #gameCanvasContainer: HTMLElement;
@@ -12,6 +13,7 @@ export class CanvasView {
   readonly #scoreValue: HTMLElement;
   readonly #highScoreValue: HTMLElement;
   readonly #gameOverScreen: HTMLElement;
+  readonly #startHint: HTMLElement;
 
   constructor(gameCanvas: HTMLCanvasElement, gameOverScreen: HTMLElement) {
     const context = gameCanvas.getContext('2d');
@@ -34,12 +36,22 @@ export class CanvasView {
       throw new Error('Could not get the high score value HTML element');
     }
 
+    const startHint = document.getElementById('start-hint');
+    if (!startHint) {
+      throw new Error('Could not get the start hint HTML element');
+    }
+
     this.#gameCanvas = gameCanvas;
     this.#gameCanvasContainer = container;
     this.#gameCanvasContext = context;
     this.#scoreValue = scoreValue;
     this.#highScoreValue = highScoreValue;
+    this.#startHint = startHint;
     this.#gameOverScreen = gameOverScreen;
+  }
+
+  get gameCanvasContainer(): HTMLElement {
+    return this.#gameCanvasContainer;
   }
 
   get bounds(): Bounds {
@@ -125,5 +137,13 @@ export class CanvasView {
 
   hideGameOverScreen() {
     this.#gameOverScreen.classList.remove(CanvasView.#GAME_OVER_VISIBLE_CLASS);
+  }
+
+  showStartHint() {
+    this.#startHint.classList.remove(CanvasView.#START_HINT_HIDDEN_CLASS);
+  }
+
+  hideStartHint() {
+    this.#startHint.classList.add(CanvasView.#START_HINT_HIDDEN_CLASS);
   }
 }

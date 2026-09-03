@@ -13,16 +13,9 @@
 </head>
 <body>
     <header class="app-header">
-        <div class="app-header__intro">
-            <h1 aria-label="Snake" class="title">
-                <span aria-hidden="true" class="title__glyph"></span><span aria-hidden="true">nake</span>
-            </h1>
-            <p class="hint">
-                Use the
-                <kbd class="key">&larr;</kbd><kbd class="key">&uarr;</kbd><kbd class="key">&darr;</kbd><kbd class="key">&rarr;</kbd>
-                arrow keys or swipe to start playing
-            </p>
-        </div>
+        <h1 aria-label="Snake" class="title">
+            <span aria-hidden="true" class="title__glyph"></span><span aria-hidden="true">nake</span>
+        </h1>
 
         <div class="score-panel">
             <div class="score-panel__row">
@@ -38,6 +31,15 @@
 
     <main class="game-area">
         <canvas id="game-canvas"></canvas>
+
+        <p class="hint hint--center start-hint" id="start-hint">
+            <span class="start-hint__keys">
+                Use the
+                <kbd class="key">&larr;</kbd><kbd class="key">&uarr;</kbd><kbd class="key">&darr;</kbd><kbd class="key">&rarr;</kbd>
+                arrow keys to start playing
+            </span>
+            <span class="start-hint__swipe">Swipe to start playing</span>
+        </p>
     </main>
 
     <div aria-labelledby="game-over-title" class="game-over-screen" id="game-over-screen" role="dialog">

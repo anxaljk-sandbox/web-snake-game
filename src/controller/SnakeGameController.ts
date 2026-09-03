@@ -9,11 +9,11 @@ import { getCoordinatesOfRandomFreeTile } from '../model/support/placement.ts';
 import type { Coordinates } from '../model/support/Coordinates.ts';
 
 export class SnakeGameController {
+  static readonly #INITIAL_SNAKE_X_POSITION = 100;
+
   readonly #canvasView: CanvasView;
   readonly #currentFood: Tile;
   readonly #score: Score;
-  readonly #initialSnakePosition: Coordinates;
-  readonly #initialFoodPosition: Coordinates;
 
   #snake: Snake;
   #pendingDirection: Direction | undefined;
@@ -23,22 +23,30 @@ export class SnakeGameController {
   constructor(canvasView: CanvasView) {
     this.#canvasView = canvasView;
 
-    this.#initialSnakePosition = { x: 200, y: this.#canvasView.bounds.height / 2 };
-
     this.#snake = new Snake(this.#initialSnakePosition);
-
-    this.#initialFoodPosition = {
-      x: this.#canvasView.bounds.width - this.#initialSnakePosition.x,
-      y: this.#initialSnakePosition.y + this.#snake.head.radius,
-    };
-
     this.#currentFood = new Tile(TileType.Circle, this.#initialFoodPosition.x, this.#initialFoodPosition.y);
 
     this.#score = new Score();
   }
 
-  get isGameInProgress() {
+  get #isGameInProgress() {
     return !this.#gameOver && this.#isMoving;
+  }
+
+  get #initialSnakePosition(): Coordinates {
+    return {
+      x: SnakeGameController.#INITIAL_SNAKE_X_POSITION,
+      y: this.#canvasView.bounds.height / 2,
+    };
+  }
+
+  get #initialFoodPosition(): Coordinates {
+    const initialSnakePosition = this.#initialSnakePosition;
+
+    return {
+      x: this.#canvasView.bounds.width - initialSnakePosition.x,
+      y: initialSnakePosition.y + this.#snake.head.radius,
+    };
   }
 
   play() {
@@ -67,6 +75,7 @@ export class SnakeGameController {
 
     this.#pendingDirection = direction;
     this.#isMoving = true;
+    this.#canvasView.hideStartHint();
   }
 
   handleRestartInput() {
@@ -75,7 +84,24 @@ export class SnakeGameController {
     }
   }
 
-  stopGame(reason: string) {
+  handleResize() {
+    if (this.#isGameInProgress) {
+      this.#stopGame('The screen has been resized during the game!');
+    } else {
+      this.#reset();
+    }
+  }
+
+  #reset() {
+    this.#snake = new Snake(this.#initialSnakePosition);
+    this.#placeFoodOnCanvas(this.#initialFoodPosition.x, this.#initialFoodPosition.y);
+    this.#pendingDirection = undefined;
+    this.#isMoving = false;
+    this.#gameOver = false;
+    this.#canvasView.showStartHint();
+  }
+
+  #stopGame(reason: string) {
     this.#isMoving = false;
     this.#gameOver = true;
     this.#canvasView.showGameOverScreen(reason, this.#score.values);
@@ -116,13 +142,13 @@ export class SnakeGameController {
     const head = this.#snake.head;
 
     if (!isInsideBounds(head, this.#canvasView.bounds)) {
-      this.stopGame('You crashed into a wall!');
+      this.#stopGame('You crashed into a wall!');
       return;
     }
 
     for (let i = 2; i < this.#snake.length; i++) {
       if (overlapsTile(head, this.#snake.body[i])) {
-        this.stopGame('You crashed into yourself!');
+        this.#stopGame('You crashed into yourself!');
       }
     }
 
@@ -146,7 +172,7 @@ export class SnakeGameController {
       occupiedTiles,
     );
     if (newFoodCoordinates === undefined) {
-      this.stopGame('You have eaten so much, that there is no more space for new food! Congratulations!');
+      this.#stopGame('You have eaten so much, that there is no more space for new food! Congratulations!');
     } else {
       this.#placeFoodOnCanvas(newFoodCoordinates.x, newFoodCoordinates.y);
     }
@@ -158,11 +184,7 @@ export class SnakeGameController {
   }
 
   #restartGame() {
-    this.#snake = new Snake(this.#initialSnakePosition);
-    this.#placeFoodOnCanvas(this.#initialFoodPosition.x, this.#initialFoodPosition.y);
-    this.#pendingDirection = undefined;
-    this.#isMoving = false;
-    this.#gameOver = false;
+    this.#reset();
     this.#canvasView.hideGameOverScreen();
   }
 }
