@@ -13,7 +13,7 @@ export class CanvasView {
   readonly #highScoreValue: HTMLElement;
   readonly #gameOverScreen: HTMLElement;
 
-  constructor(gameCanvas: HTMLCanvasElement) {
+  constructor(gameCanvas: HTMLCanvasElement, gameOverScreen: HTMLElement) {
     const context = gameCanvas.getContext('2d');
     if (!context) {
       throw new Error('Could not get a 2D rendering context for the game canvas');
@@ -34,11 +34,6 @@ export class CanvasView {
       throw new Error('Could not get the high score value HTML element');
     }
 
-    const gameOverScreen = document.getElementById('game-over-screen');
-    if (!gameOverScreen) {
-      throw new Error('Could not get the game over screen');
-    }
-
     this.#gameCanvas = gameCanvas;
     this.#gameCanvasContainer = container;
     this.#gameCanvasContext = context;
@@ -52,6 +47,10 @@ export class CanvasView {
       height: this.#gameCanvas.height,
       width: this.#gameCanvas.width,
     };
+  }
+
+  get hasContainerSizeChanged(): boolean {
+    return this.#gameCanvas.width !== this.#gameCanvasContainer.clientWidth || this.#gameCanvas.height !== this.#gameCanvasContainer.clientHeight;
   }
 
   resizeCanvas() {
