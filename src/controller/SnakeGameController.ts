@@ -9,13 +9,6 @@ import { getCoordinatesOfRandomFreeTile } from '../model/support/placement.ts';
 import type { Coordinates } from '../model/support/Coordinates.ts';
 
 export class SnakeGameController {
-  static readonly #KEY_TO_DIRECTION: Record<string, Direction> = {
-    ArrowUp: Direction.Up,
-    ArrowDown: Direction.Down,
-    ArrowLeft: Direction.Left,
-    ArrowRight: Direction.Right,
-  };
-
   readonly #canvasView: CanvasView;
   readonly #currentFood: Tile;
   readonly #score: Score;
@@ -67,19 +60,18 @@ export class SnakeGameController {
     window.requestAnimationFrame(() => this.play());
   }
 
-  handleKeyDown(key: string) {
-    if (this.#gameOver && key === 'Enter') {
-      this.#restart();
-    }
+  handleDirectionInput(direction: Direction) {
+    if (this.#gameOver) return;
+    if (direction === oppositeDirection[this.#snake.direction]) return;
+    if (direction === this.#snake.direction && this.#isMoving) return;
 
-    if (!this.#gameOver) {
-      const newDirection = SnakeGameController.#KEY_TO_DIRECTION[key];
+    this.#pendingDirection = direction;
+    this.#isMoving = true;
+  }
 
-      if (newDirection === undefined || newDirection === oppositeDirection[this.#snake.direction]) return;
-      if (newDirection === this.#snake.direction && this.#isMoving) return;
-
-      this.#pendingDirection = newDirection;
-      this.#isMoving = true;
+  handleRestartInput() {
+    if (this.#gameOver) {
+      this.#restartGame();
     }
   }
 
@@ -165,7 +157,7 @@ export class SnakeGameController {
     this.#canvasView.updateScores(this.#score.values);
   }
 
-  #restart() {
+  #restartGame() {
     this.#snake = new Snake(this.#initialSnakePosition);
     this.#placeFoodOnCanvas(this.#initialFoodPosition.x, this.#initialFoodPosition.y);
     this.#pendingDirection = undefined;

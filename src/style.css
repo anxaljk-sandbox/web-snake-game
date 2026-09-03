@@ -23,7 +23,7 @@
 body {
   margin: 0;
   padding: var(--space-page);
-  height: 100dvh;
+  height: 100svh;
   display: flex;
   flex-direction: column;
   gap: clamp(20px, 3vh, 32px);
@@ -163,6 +163,7 @@ body {
 
 #game-canvas {
   display: block;
+  touch-action: none;
 }
 
 .game-over-screen {
